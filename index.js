@@ -1,170 +1,344 @@
-import { maxBy, minBy, size, isFinite, isNil } from 'lodash'
-import { get, compose, isEqual, map, every, values, keys, each, replace, round, isInteger, omit, omitBy, isArray, isPlainObject, curry, spread, sum, max, groupBy, sortBy, set, divide, capitalize, lowerCase, differenceBy, flatten, min, mean, filter, compact } from 'lodash/fp'
-import isEmail from 'validator/lib/isEmail'
-import isURL from 'validator/lib/isURL'
-import parcelLineItemRules from './parcelLineItemRules'
+'use strict';
 
-export const trace = curry((tag, x) => {
-  console.log(tag, x);
-  return x
-})
+Object.defineProperty(exports, '__esModule', { value: true });
 
-export const getMaxMinString = (plans, attr) => minBy(plans, attr) === maxBy(plans, attr)
-  ? plans[0][attr]
-  : `${minBy(plans, attr)[attr]} - ${maxBy(plans, attr)[attr]}`
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-export const getRangeString = (max, min, prefix) => max === min
-  ? `${prefix ? prefix : ''}${max.toLocaleString()}`
-  : `${prefix ? prefix : ''}${min.toLocaleString()} - ${prefix ? prefix : ''}${max.toLocaleString()}`
+var _compact = _interopDefault(require('lodash/fp/compact'));
+var _filter = _interopDefault(require('lodash/fp/filter'));
+var _mean = _interopDefault(require('lodash/fp/mean'));
+var _min = _interopDefault(require('lodash/fp/min'));
+var _flatten = _interopDefault(require('lodash/fp/flatten'));
+var _differenceBy = _interopDefault(require('lodash/fp/differenceBy'));
+var _lowerCase = _interopDefault(require('lodash/fp/lowerCase'));
+var _capitalize = _interopDefault(require('lodash/fp/capitalize'));
+var _divide = _interopDefault(require('lodash/fp/divide'));
+var _set = _interopDefault(require('lodash/fp/set'));
+var _sortBy = _interopDefault(require('lodash/fp/sortBy'));
+var _groupBy = _interopDefault(require('lodash/fp/groupBy'));
+var _max = _interopDefault(require('lodash/fp/max'));
+var _sum = _interopDefault(require('lodash/fp/sum'));
+var _spread = _interopDefault(require('lodash/fp/spread'));
+var _isPlainObject = _interopDefault(require('lodash/fp/isPlainObject'));
+var _isArray = _interopDefault(require('lodash/fp/isArray'));
+var _omitBy = _interopDefault(require('lodash/fp/omitBy'));
+var _omit = _interopDefault(require('lodash/fp/omit'));
+var _isInteger = _interopDefault(require('lodash/fp/isInteger'));
+var _round = _interopDefault(require('lodash/fp/round'));
+var _replace = _interopDefault(require('lodash/fp/replace'));
+var _each = _interopDefault(require('lodash/fp/each'));
+var _keys = _interopDefault(require('lodash/fp/keys'));
+var _values = _interopDefault(require('lodash/fp/values'));
+var _every = _interopDefault(require('lodash/fp/every'));
+var _map = _interopDefault(require('lodash/fp/map'));
+var _isEqual = _interopDefault(require('lodash/fp/isEqual'));
+var _compose = _interopDefault(require('lodash/fp/compose'));
+var _get = _interopDefault(require('lodash/fp/get'));
+var _isNil = _interopDefault(require('lodash/isNil'));
+var _isFinite = _interopDefault(require('lodash/isFinite'));
+var _size = _interopDefault(require('lodash/size'));
+var _minBy = _interopDefault(require('lodash/minBy'));
+var _maxBy = _interopDefault(require('lodash/maxBy'));
+var isEmail = _interopDefault(require('validator/lib/isEmail'));
+var isURL = _interopDefault(require('validator/lib/isURL'));
+var _includes = _interopDefault(require('lodash/fp/includes'));
+var _negate = _interopDefault(require('lodash/fp/negate'));
 
-export const getMinPrice = (model, variants) => get('offers[0].price', minBy([model, ...variants], model => get('offers[0].price', model)))
-export const getMaxPrice = (model, variants) => get('offers[0].price', maxBy([model, ...variants], model => get('offers[0].price', model)))
+var parcelLineItemRules = {
+  'cj5vmxoug3eto0193ysu3twpi': { // Percolation Test
+    show: _compose(_includes(_includes.placeholder, ['Perc_Test_Required']), _get('sewer'))
+  },
+  'cj5vn9wp03f340193qocjiy3s': { // Water Connection Fee
+    show: _compose(_includes(_includes.placeholder, ['At_Lot_Line', 'At_Street']), _get('water'))
+  },
+  'cj5vnak7h3f3n019343witgj9': { // Well Permit
+    show: _compose(_includes(_includes.placeholder, ['Needs_Well']), _get('water'))
+  },
+  'cj5vnb5nn3f3z0193d3yqva4p': { // Sewer Connection Fee
+    show: _compose(_includes(_includes.placeholder, ['At_Lot_Line', 'At_Street']), _get('sewer'))
+  },
+  'cj5vnbzslg3l70161iwz0315h': { // Septic System Permit
+    show: _compose(_includes(_includes.placeholder, ['Perc_Test_Required', 'Approved_For_1_Bedroom_Septic', 'Approved_For_2_Bedroom_Septic', 'Approved_For_3_Bedroom_Septic', 'Approved_For_4_Bedroom_Septic', 'Approved_For_5_Bedroom_Septic']), _get('sewer'))
+  },
+  'cj5vnd3e5g3lt0161qgy9my13': { // Electric Connection Fee
+    show: _compose(_includes(_includes.placeholder, ['At_Street', 'At_Lot_Line']), _get('electric'))
+  },
+  'cj5vndiui3f5b01932g6t4gu3': { // Gas Connection Fee
+    show: _compose(_includes(_includes.placeholder, ['At_Street', 'At_Lot_Line']), _get('gas'))
+  },
+  'cj5vne4nqg3mi016141l420fu': { // Communications Connection Fee
+    show: _compose(_includes(_includes.placeholder, ['At_Street', 'At_Lot_Line']), _get('communications'))
+  },
+  'cj5vnkyfz3f9e01932brd0edc': { // Deconstruction / Demolition
+    show: _get('hasExistingStructure')
+  },
+  'cj3aposh41sbp01405ze4etei': { // Excavation / Earthwork
+    show: _negate(_get('hasBuildingPad'))
+  },
+  'cj5vnm125g3qz0161hxw8ys5g': { // Septic Installation
+    show: _compose(_includes(_includes.placeholder, ['Perc_Test_Required', 'Approved_For_1_Bedroom_Septic', 'Approved_For_2_Bedroom_Septic', 'Approved_For_3_Bedroom_Septic', 'Approved_For_4_Bedroom_Septic', 'Approved_For_5_Bedroom_Septic']), _get('sewer'))
+  },
+  'cj5vnmjc03faf0193m9vujpsp': { // Well Installation
+    show: _compose(_includes(_includes.placeholder, ['Needs_Well']), _get('water'))
+  }
+};
 
-export const getOfferMeta = (model, variants) => getMinPrice(model, variants) === getMaxPrice(model, variants) ? ({
-  "@type": "Offer",
-  "price": getMinPrice(model, variants)
-}) : ({
-  "@type": "AggregateOffer",
-  "lowPrice": getMinPrice(model, variants),
-  "highPrice": getMaxPrice(model, variants)
-})
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
 
-export const isShallowEqual = compose(
-  spread(isEqual),
-  map(omitBy(isPlainObject)),
-  map(omitBy(value => isArray(value) && isPlainObject(value[0]))),
-  map(omit('id'))
-)
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
 
-export const convertMarkupToPlainText = (markup) => {
-  var tmp = document.createElement('DIV')
-  tmp.innerHTML = markup
-  return tmp.textContent || tmp.innerText || ''
-}
+var getMaxMinString = function getMaxMinString(plans, attr) {
+  return _minBy(plans, attr) === _maxBy(plans, attr) ? plans[0][attr] : _minBy(plans, attr)[attr] + ' - ' + _maxBy(plans, attr)[attr];
+};
 
-export const calculatePriceFromOffers = level => compose(
-  sum,
-  map(compose(
-    (level === 'min' ? min : level === 'max' ? max : mean),
-    map(get('price'))
-  )),
-  groupBy(get('lineItems')),
-  map(offer => set('lineItems', compose(
-    sortBy(id => id),
-    map(get('id')),
-    get('lineItems')
-  )(offer), offer))
-)
+var getRangeString = function getRangeString(max, min, prefix) {
+  return max === min ? '' + (prefix ? prefix : '') + max.toLocaleString() : '' + (prefix ? prefix : '') + min.toLocaleString() + ' - ' + (prefix ? prefix : '') + max.toLocaleString();
+};
 
-export const getExcludedLineItems = (model, allLineItems) => compose(
-  filter(lineItem => lineItem.category !== 'Extras'),
-  differenceBy('id', allLineItems),
-  flatten,
-  map(get('lineItems')),
-  get('offers')
-)(model)
+var getMinPrice = function getMinPrice(model, variants) {
+  return _get('offers[0].price', _minBy([model].concat(toConsumableArray(variants)), function (model) {
+    return _get('offers[0].price', model);
+  }));
+};
+var getMaxPrice = function getMaxPrice(model, variants) {
+  return _get('offers[0].price', _maxBy([model].concat(toConsumableArray(variants)), function (model) {
+    return _get('offers[0].price', model);
+  }));
+};
 
-export const getProjectServices = (Model, Parcel, allLineItems) => compose(
-  sortBy('position'),
-  filter(service => parcelLineItemRules[service.id]
-    ? parcelLineItemRules[service.id].show(Parcel)
-    : true
-  )
-)(getExcludedLineItems(Model, allLineItems))
+var getOfferMeta = function getOfferMeta(model, variants) {
+  return getMinPrice(model, variants) === getMaxPrice(model, variants) ? {
+    "@type": "Offer",
+    "price": getMinPrice(model, variants)
+  } : {
+    "@type": "AggregateOffer",
+    "lowPrice": getMinPrice(model, variants),
+    "highPrice": getMaxPrice(model, variants)
+  };
+};
 
-export const calculateProjectPrice = level => (Model, Parcel, allLineItems) => compose(
-  sum,
-  compact
-)([
-  compose(calculatePriceFromOffers(level), get('offers'))(Model),
-  get('price', Parcel),
-  compose(
-    sum, 
-    map(lineItem => level === 'min'
-      ? get('minPrice', lineItem) 
-      : level === 'max'
-        ? get('maxPrice', lineItem)
-        : mean([get('minPrice', lineItem), get('maxPrice', lineItem)])
-    )
-  )(getProjectServices(Model, Parcel, allLineItems))
-])
+var isShallowEqual = _compose(_spread(_isEqual), _map(_omitBy(_isPlainObject)), _map(_omitBy(function (value) {
+  return _isArray(value) && _isPlainObject(value[0]);
+})), _map(_omit('id')));
 
-export const formatLocaleString = number => number && number.toLocaleString()
+var convertMarkupToPlainText = function convertMarkupToPlainText(markup) {
+  var tmp = document.createElement('DIV');
+  tmp.innerHTML = markup;
+  return tmp.textContent || tmp.innerText || '';
+};
 
-export const formatDateTimeString = utcString => utcString && new Date(utcString).toLocaleString()
+var calculatePriceFromOffers = function calculatePriceFromOffers(level) {
+  return _compose(_sum, _map(_compose(level === 'min' ? _min : level === 'max' ? _max : _mean, _map(_get('price')))), _groupBy(_get('lineItems')), _map(function (offer) {
+    return _set('lineItems', _compose(_sortBy(function (id) {
+      return id;
+    }), _map(_get('id')), _get('lineItems'))(offer), offer);
+  }));
+};
 
-const convertToAcres = value => value && divide(value, 43560)
+var getExcludedLineItems = function getExcludedLineItems(model, allLineItems) {
+  return _compose(_filter(function (lineItem) {
+    return lineItem.category !== 'Extras';
+  }), _differenceBy('id', allLineItems), _flatten, _map(_get('lineItems')), _get('offers'))(model);
+};
 
-const roundTo = precision => value => typeof value === 'number' && value.toFixed(precision)
+var getProjectServices = function getProjectServices(Model, Parcel, allLineItems) {
+  return _compose(_sortBy('position'), _filter(function (service) {
+    return parcelLineItemRules[service.id] ? parcelLineItemRules[service.id].show(Parcel) : true;
+  }))(getExcludedLineItems(Model, allLineItems));
+};
 
-export const formatArea = sqft => typeof sqft === 'number' && sqft >= 10000 ? ({ value: compose(formatLocaleString, roundTo(2), convertToAcres)(sqft), label: 'acres'}) : ({ value: formatLocaleString(sqft), label: 'sqft' })
+var calculateProjectPrice = function calculateProjectPrice(level) {
+  return function (Model, Parcel, allLineItems) {
+    return _compose(_sum, _compact)([_compose(calculatePriceFromOffers(level), _get('offers'))(Model), _get('price', Parcel), _compose(_sum, _map(function (lineItem) {
+      return level === 'min' ? _get('minPrice', lineItem) : level === 'max' ? _get('maxPrice', lineItem) : _mean([_get('minPrice', lineItem), _get('maxPrice', lineItem)]);
+    }))(getProjectServices(Model, Parcel, allLineItems))]);
+  };
+};
 
-export const convertToLetter = idx => String.fromCharCode(97 + idx).toUpperCase()
+var formatLocaleString = function formatLocaleString(number) {
+  return number && number.toLocaleString();
+};
 
-export const formatEnum = compose(capitalize, lowerCase)
+var formatDateTimeString = function formatDateTimeString(utcString) {
+  return utcString && new Date(utcString).toLocaleString();
+};
 
-export const formatUrl = url => url && (url.indexOf('://') === -1) ? `http://${url}` : url
-export const getHostname = compose(get('hostname'), url => url && new URL(url), formatUrl)
+var convertToAcres = function convertToAcres(value) {
+  return value && _divide(value, 43560);
+};
 
+var roundTo = function roundTo(precision) {
+  return function (value) {
+    return typeof value === 'number' && value.toFixed(precision);
+  };
+};
 
-export const isNotEmpty = a => !!a && a.trim().length > 0
+var formatArea = function formatArea(sqft) {
+  return typeof sqft === 'number' && sqft >= 10000 ? { value: _compose(formatLocaleString, roundTo(2), convertToAcres)(sqft), label: 'acres' } : { value: formatLocaleString(sqft), label: 'sqft' };
+};
 
-export const markupIsNotEmpty = a => a.getEditorState().getCurrentContent().hasText()
+var convertToLetter = function convertToLetter(idx) {
+  return String.fromCharCode(97 + idx).toUpperCase();
+};
 
+var formatEnum = _compose(_capitalize, _lowerCase);
 
-const sort = list => [].concat(list).sort()
+var formatUrl = function formatUrl(url) {
+  return url && url.indexOf('://') === -1 ? 'http://' + url : url;
+};
+var getHostname = _compose(_get('hostname'), function (url) {
+  return url && new URL(url);
+}, formatUrl);
 
-export const isLocation = a => compose(isEqual(['description', 'placeId']), sort, keys)(a) && compose(every(Boolean), values)(a)
+var isNotEmpty = function isNotEmpty(a) {
+  return !!a && a.trim().length > 0;
+};
 
-const hasFields = fields => compose(isEqual(fields), keys)
+var markupIsNotEmpty = function markupIsNotEmpty(a) {
+  return a.getEditorState().getCurrentContent().hasText();
+};
 
-export const eachItemHasFields = fields => compose(map, hasFields)(fields)
+var sort = function sort(list) {
+  return [].concat(list).sort();
+};
 
-const fieldsAreNonNil = each(field => !isNil(field))
+var isLocation = function isLocation(a) {
+  return _compose(_isEqual(['description', 'placeId']), sort, _keys)(a) && _compose(_every(Boolean), _values)(a);
+};
 
-export const eachItemHasNonNilFields = compose(map, fieldsAreNonNil)
+var hasFields = function hasFields(fields) {
+  return _compose(_isEqual(fields), _keys);
+};
 
-export const isNumber = isFinite
+var eachItemHasFields = function eachItemHasFields(fields) {
+  return _compose(_map, hasFields)(fields);
+};
 
-export const hasLength = value => size(value) > 0
+var fieldsAreNonNil = _each(function (field) {
+  return !_isNil(field);
+});
 
-export const convertToNumberString = number => isNumber(number) ? number.toLocaleString('en-US') : null
+var eachItemHasNonNilFields = _compose(_map, fieldsAreNonNil);
 
-export const convertToCurrency = number => isNumber(number) ? `$${convertToNumberString(number)}` : null
+var isNumber = _isFinite;
 
+var hasLength = function hasLength(value) {
+  return _size(value) > 0;
+};
 
-export const getValue = get(['target', 'value'])
+var convertToNumberString = function convertToNumberString(number) {
+  return isNumber(number) ? number.toLocaleString('en-US') : null;
+};
 
-export const getFloat = compose(parseFloat, getValue)
+var convertToCurrency = function convertToCurrency(number) {
+  return isNumber(number) ? '$' + convertToNumberString(number) : null;
+};
 
-export const getNumberFromNumberString = compose(parseFloat, replace(',', ''), getValue)
+var getValue = _get(['target', 'value']);
 
-export const getCurrency = compose(parseFloat, replace('$', ''), replace(',', ''), getValue)
+var getFloat = _compose(parseFloat, getValue);
+
+var getNumberFromNumberString = _compose(parseFloat, _replace(',', ''), getValue);
+
+var getCurrency = _compose(parseFloat, _replace('$', ''), _replace(',', ''), getValue);
 
 // Redux form validation
-export const required = value => (value ? undefined : 'required')
+var required = function required(value) {
+  return value ? undefined : 'required';
+};
 
-export const location = value => !value || (value && value.placeId) ? undefined : 'must be valid place'
+var location = function location(value) {
+  return !value || value && value.placeId ? undefined : 'must be valid place';
+};
 
-export const email = value => value && isEmail(value) ? undefined : 'must be valid email'
+var email = function email(value) {
+  return value && isEmail(value) ? undefined : 'must be valid email';
+};
 
-export const length = value => size(value) > 0 ? undefined : 'must have at least one'
+var length = function length(value) {
+  return _size(value) > 0 ? undefined : 'must have at least one';
+};
 
-export const number = value => isFinite(value) ? undefined : 'must be valid number'
+var number = function number(value) {
+  return _isFinite(value) ? undefined : 'must be valid number';
+};
 
-export const integer = value => isInteger(value) ? undefined : 'must be a whole number'
+var integer = function integer(value) {
+  return _isInteger(value) ? undefined : 'must be a whole number';
+};
 
-export const phoneNumber = value => size(value) === 10 && number(value) ? undefined : 'must be valid phone number'
+var phoneNumber = function phoneNumber(value) {
+  return _size(value) === 10 && number(value) ? undefined : 'must be valid phone number';
+};
 
-export const url = value => value && isURL(value) ? undefined : 'must be valid url'
-
+var url = function url(value) {
+  return value && isURL(value) ? undefined : 'must be valid url';
+};
 
 // Redux form format and parse
-export const parseNumber = compose(parseFloat, replace(/,/g, ''))
-export const formatNumber = number => isNumber(number) ? convertToNumberString(number) : ''
+var parseNumber = _compose(parseFloat, _replace(/,/g, ''));
+var formatNumber = function formatNumber(number) {
+  return isNumber(number) ? convertToNumberString(number) : '';
+};
 
-export const parseCurrency = compose(parseFloat, replace(/\$/g, ''), replace(/,/g, ''))
-export const formatCurrency = number => isNumber(number) ? `$${compose(convertToNumberString, round)(number)}` : ''
+var parseCurrency = _compose(parseFloat, _replace(/\$/g, ''), _replace(/,/g, ''));
+var formatCurrency = function formatCurrency(number) {
+  return isNumber(number) ? '$' + _compose(convertToNumberString, _round)(number) : '';
+};
 
-export const parsePhoneNumber = replace(/\D/g, '')
-export const formatPhoneNumber = value => value ? value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') : ''
+var parsePhoneNumber = _replace(/\D/g, '');
+var formatPhoneNumber = function formatPhoneNumber(value) {
+  return value ? value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') : '';
+};
+
+exports.getMaxMinString = getMaxMinString;
+exports.getRangeString = getRangeString;
+exports.getMinPrice = getMinPrice;
+exports.getMaxPrice = getMaxPrice;
+exports.getOfferMeta = getOfferMeta;
+exports.isShallowEqual = isShallowEqual;
+exports.convertMarkupToPlainText = convertMarkupToPlainText;
+exports.calculatePriceFromOffers = calculatePriceFromOffers;
+exports.getExcludedLineItems = getExcludedLineItems;
+exports.getProjectServices = getProjectServices;
+exports.calculateProjectPrice = calculateProjectPrice;
+exports.formatLocaleString = formatLocaleString;
+exports.formatDateTimeString = formatDateTimeString;
+exports.formatArea = formatArea;
+exports.convertToLetter = convertToLetter;
+exports.formatEnum = formatEnum;
+exports.formatUrl = formatUrl;
+exports.getHostname = getHostname;
+exports.isNotEmpty = isNotEmpty;
+exports.markupIsNotEmpty = markupIsNotEmpty;
+exports.isLocation = isLocation;
+exports.eachItemHasFields = eachItemHasFields;
+exports.eachItemHasNonNilFields = eachItemHasNonNilFields;
+exports.isNumber = isNumber;
+exports.hasLength = hasLength;
+exports.convertToNumberString = convertToNumberString;
+exports.convertToCurrency = convertToCurrency;
+exports.getValue = getValue;
+exports.getFloat = getFloat;
+exports.getNumberFromNumberString = getNumberFromNumberString;
+exports.getCurrency = getCurrency;
+exports.required = required;
+exports.location = location;
+exports.email = email;
+exports.length = length;
+exports.number = number;
+exports.integer = integer;
+exports.phoneNumber = phoneNumber;
+exports.url = url;
+exports.parseNumber = parseNumber;
+exports.formatNumber = formatNumber;
+exports.parseCurrency = parseCurrency;
+exports.formatCurrency = formatCurrency;
+exports.parsePhoneNumber = parsePhoneNumber;
+exports.formatPhoneNumber = formatPhoneNumber;
