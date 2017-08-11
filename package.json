@@ -15,7 +15,6 @@
   "bugs": {
     "url": "https://github.com/composeHome/utils/issues"
   },
-  "private": true,
   "homepage": "https://github.com/composeHome/utils#readme",
   "dependencies": {
     "lodash": "^4.17.4",
