@@ -4,6 +4,8 @@ import isEmail from 'validator/lib/isEmail'
 import isURL from 'validator/lib/isURL'
 import parcelLineItemRules from './parcelLineItemRules'
 
+export * from './constants'
+
 export const getMaxMinString = (plans, attr) => minBy(plans, attr) === maxBy(plans, attr)
   ? plans[0][attr]
   : `${minBy(plans, attr)[attr]} - ${maxBy(plans, attr)[attr]}`

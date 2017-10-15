@@ -83,6 +83,35 @@ var parcelLineItemRules = {
   }
 };
 
+var garageEnums = {
+  None: 'None',
+  One_Car: '1 car',
+  Two_Plus_Car: '2+ car'
+};
+
+var constructionTypeEnums = {
+  Modular: 'Modular',
+  Panelized: 'Panelized',
+  Kit: 'Kit'
+};
+
+var lineItemStatusEnums = {
+  Included: 'Included',
+  Included_and_Upgrades: 'Included and has Upgrades',
+  Upgrade: 'Upgrade',
+  Not_Included: 'Not Included',
+  Not_Applicable: 'Not Applicable'
+};
+
+var categoryEnums = {
+  General: 'General',
+  Site_Foundation: 'Site & Foundation',
+  Structure: 'Structure',
+  Finishes: 'Finishes',
+  Mechanical_Electrical_and_Plumbing: 'Mechanical, Electrical and Plumbing',
+  Extras: 'Extras'
+};
+
 var toConsumableArray = function (arr) {
   if (Array.isArray(arr)) {
     for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
@@ -342,3 +371,7 @@ exports.parseCurrency = parseCurrency;
 exports.formatCurrency = formatCurrency;
 exports.parsePhoneNumber = parsePhoneNumber;
 exports.formatPhoneNumber = formatPhoneNumber;
+exports.garageEnums = garageEnums;
+exports.constructionTypeEnums = constructionTypeEnums;
+exports.lineItemStatusEnums = lineItemStatusEnums;
+exports.categoryEnums = categoryEnums;
